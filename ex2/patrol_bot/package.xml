@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<package>
+  <name>patrol_bot</name>
+  <version>1.0.0</version>
+  <description>The Patrol Bot application exersize</description>
+
+  <maintainer email="dany.rovinsky@gmail.com">304359276</maintainer>
+
+  <license>BSD</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>rospy</build_depend>
+  <build_depend>std_msgs</build_depend>
+  <build_depend>amcl</build_depend>
+  <build_depend>fake_localization</build_depend>
+  <build_depend>gmapping</build_depend>
+  <build_depend>map_server</build_depend>
+  <build_depend>move_base</build_depend>
+  <build_depend>stage_ros</build_depend>
+
+  <run_depend>rospy</run_depend>
+  <run_depend>std_msgs</run_depend>
+  <run_depend>amcl</run_depend>
+  <run_depend>fake_localization</run_depend>
+  <run_depend>gmapping</run_depend>
+  <run_depend>map_server</run_depend>
+  <run_depend>move_base</run_depend>
+  <run_depend>stage_ros</run_depend>
+
+</package>
