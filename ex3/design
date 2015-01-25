@@ -1,0 +1,67 @@
+Requirements:
+-------------
+
+Robot must be able to parse a given map file (.pgm)
+Robot must extract its initial location from launch parameters?
+Robot must implement its navigation using East,West,South,North directions only.
+Robot must be able to convert 
+
+
+1. Get the .pgm
+2. Convert it to 2Dx2D map
+2.1. Reduce 2Dx2D map to contain only the connected component containing the initial location.
+2.2. Count the amount of free cells for later logging.
+3. Calculate minimum spanning tree on the 2Dx2D map from a given initial location.
+5. Calculate Hamiltonian cycle on a decomposition of the 2Dx2D map to a DxD map.
+6. Start traversing over the Hamiltonian cycle, until complete.
+6.1. TODO: What happens if a certain cell wasn't accessible? (a) Why would that happen, but (b) why is there a requirement to log how many cells were covered by the robot?
+7. Log the results as required:
+7.1. The amount of accesible cells from initial robot location.
+7.2. The amount of cells covered by the robot.
+7.3. Total coverage time. 
+
+
+Design:
+-------
+
+Offline Components:
+
+Goal: Given a pgm (and location?), creates a 2Dx2D-size map then calculates the spanning tree and the Hamiltonian cycle.
+
+1. Map converter - Can convert a map with given cells size to a new map with a different cell size.
+2. MST - Given a map, can find the minimal spanning tree of that map.
+3. Path - Given a 2Dx2D map
+
+
+
+1. Returns the cycle, as an array of directions? (e.g. ["up", "left", "down", etc])
+2. Has an iterator-like interface with getNext()? Where getNext() might return one of "up", "down", "left", "right". Or an index of a DxD matrix?
+3. Other?
+
+
+Robot component:
+Is able to traverse one cell (i.e. its self-length) to each of the four directions, accepting the "up", "down", "left", "right" commands.
+
+Main component:
+Inits offline component, waits for offline calculations (timeout?).
+Inits the robot component, starts the main loop that will guide the robot which cell to go to, until the cycle is complete
+
+
+Possible roadmap:
+1. Get the gazebo running with rectangular bot
+2. Create the bot class, make it accept the four commands (either via topic, or via function call from the main, that will (for now) read from topic)
+3. Create the map converter, have a main for it that would display the converted map
+4. Create the MST and draw it
+5. Create the Hamilton cycle and draw it
+6. Make 3-5 work together
+7. Create the main component that will combine everything
+
+Steps:
+1. Main inits.
+2. Main initializes MapConverter, giving it a .pgm (either as file, or inmemory).
+3. MapConverter now holds the 2Dx2D map.
+4. Main initializes MST with that MapConverter object and a starting point/cell.
+5. MST calculates the minimal spanning tree over 2Dx2D map, starting at the starting cell using DFS or PRIM algorithms (note that if DFS is started from the starting point, it will only provide us with the connected map component, so we'll achive both MST and map reduction).
+6. 
+
+
