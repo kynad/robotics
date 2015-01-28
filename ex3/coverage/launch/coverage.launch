@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch> 
+    <param name="/use_sim_time" value="true" />   
+    
+    <!-- Launch world -->
+    <include file="$(find gazebo_ros)/launch/willowgarage_world.launch"/>     
+ 
+    <param name="robot_description" textfile="$(find r2d2_description)/urdf/r2d2.urdf"/>
+    <!-- for using Lizi: --> 
+    <!--<param name="robot_description" textfile="$(find lizi_description)/urdf/lizi.urdf"/>-->
+   
+    <!-- Spawn robot's model -->
+    <arg name="init_pose" value="-x -5 -y -2 -z 1"/>
+    <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" args="$(arg init_pose) -urdf -param robot_description -model my_robot" output="screen"/>
+ 
+    <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher"/>
+    <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher" output="screen"/> 
+     
+    <!-- Launch coverage node -->
+    <node name="coverage_node" pkg="coverage" type="coverage_node" output="screen"/>   
+ 
+</launch>
