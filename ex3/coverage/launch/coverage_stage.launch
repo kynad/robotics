@@ -8,6 +8,6 @@
   <node pkg="stage_ros" type="stageros" name="stageros" args="$(find coverage)/stage_config/worlds/willow-pr2-5cm.world"/>   
   <include file="$(find coverage)/move_base_config/amcl_node.xml"/> 
 
-  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find coverage)/single_robot.rviz" /> 
-  <node name="coverage_node" pkg="coverage" type="coverage_node.py" output="screen"/>
+  <!--node name="rviz" pkg="rviz" type="rviz" args="-d $(find coverage)/single_robot.rviz" /-->
+  <node name="traverse_bot" pkg="coverage" type="coverage.py" output="screen"/>
 </launch>
