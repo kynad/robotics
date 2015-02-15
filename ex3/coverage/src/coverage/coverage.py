@@ -1,57 +1,50 @@
 #!/usr/bin/python
 
-"""
-This class will represent a robot that is aware of it's dimentions and is able to move to one of the four directions, advancing by it's own length each time.
-"""
+from robot import DirectionalBot
+from Mapreader import mapreader
+from nav_msgs.srv import GetMap
+import numpy, rospy
 
-import rospy
-from geometry_msgs.msg import Twist
 
-class TraverseBot:
+ROBOT_GIRTH = 1
 
-    ANGLE = 1.57
-    RATE = 5.0
-    LEFT=1
-    RIGHT=-1
+def values_derivative(values):
+    values = map(lambda x: x.get_coords(), values)
+    return [tuple(numpy.subtract(values[i-1], values[i])) for i in xrange(len(values))]
     
-    def __init__(self, girth):
-        self.girth = girth
-        rospy.init_node("traverse_bot")
-        self.publisher = rospy.Publisher('cmd_vel', Twist, queue_size=int(self.RATE))
-        rospy.sleep(1)
-        self.rate = rospy.Rate(self.RATE)
-
-    def stop(self):
-        twist = Twist()
-        self.publisher.publish(twist)
-
-    def move(self, twist):
-        for i in xrange(int(self.RATE)):
-            self.publisher.publish(twist)
-            self.rate.sleep()
-        self.stop()
-            
-    def turn(self, direction):
-        twist = Twist()
-        twist.angular.z = self.ANGLE * direction
-        self.move(twist)
-            
-    def turnLeft(self):
-        self.turn(self.LEFT)
+def convert_path_to_directions(path):
+    # take a path, i.e. a list of matrix indecies and convert it to directions (i.e. a list of "left", "right", or similar)
+    derivatives = values_derivative(path)
+    conversion_dict = {(-1,0) : "north", (0,1) : "east", (1,0) : "south", (0,-1) : "west"}
+    result = []
+    for delta in derivatives:
+        if delta in conversion_dict:
+            result.append(conversion_dict[delta])
+        else:
+            raise Exception("Wrong path")
+    return result
     
-    def turnRight(self):
-        self.turn(self.RIGHT)
-            
-    def goForward(self):
-        twist = Twist()
-        twist.linear.x = self.girth / self.RATE
-        self.move(twist)
-
 
 if __name__ == "__main__":
-    bot = TraverseBot(10)
+    map_client = rospy.ServiceProxy("static_map", GetMap)
+    rospy.wait_for_service("static_map")
+    responce = map_client()
+    info = responce.map.info
+    width = info.width
+    height = info.height
+    resolution = info.resolution
+    pgm_map = [responce.map.data[i:i+width] for i in xrange(0, width*height, width)]
+
+    robot_x = rospy.get_param('/amcl/initial_pose_x')
+    robot_y = rospy.get_param('/amcl/initial_pose_y')
+
+    reader = mapreader(pgm_map, resolution, ROBOT_GIRTH, ROBOT_GIRTH, robot_x, robot_y)
+
+    directions = convert_path_to_directions(reader.path)
+
+    bot = DirectionalBot(ROBOT_GIRTH)
+    index = 0
     while not rospy.is_shutdown():
-        bot.turnLeft()
-        bot.goForward()
-        bot.turnRight()
-        bot.goForward()
+         bot.go(directions[index])
+         index = (index + 1) % len(directions)
+         rospy.sleep(1)
