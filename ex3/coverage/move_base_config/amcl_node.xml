@@ -4,6 +4,7 @@
 -->
 <node pkg="amcl" type="amcl" name="amcl" respawn="true">
   <remap from="scan" to="base_scan" />
+  <!---26.068 12.140 0 87.363-->
   <param name="initial_pose_x" value="13.279"/>
   <param name="initial_pose_y" value="28.4"/>
   <param name="initial_pose_a" value="0.175"/>

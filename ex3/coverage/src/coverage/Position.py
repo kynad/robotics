@@ -11,4 +11,9 @@ class Position:
     def get_coords(self):
         return (self.i, self.j)
 
-        
+    def get_position(self):
+        return (prescision(self.x, 2), prescision(self.y, 2))
+
+def prescision(double, prescision):
+    divisor = pow(10, prescision)
+    return int(double*divisor)/(1.0*divisor)

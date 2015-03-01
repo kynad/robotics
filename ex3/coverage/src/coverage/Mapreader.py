@@ -9,12 +9,12 @@ class mapreader:
 #resolution is the length in meters of each square
 
 #I should get from the file all these parameters
-    robot_location_x =4.8
-    robot_location_y = 3.1
     left_bottom_x=0.0
     left_bottom_y=0.0
 
     def __init__(self, origin_map, origin_resolution, robot_width, robot_height, robot_x, robot_y):
+
+        print "initial position is (%f, %f)" % (robot_x, robot_y)
 
         self.robot_hight = robot_height
         self.robot_width = robot_width
@@ -34,9 +34,10 @@ class mapreader:
     
         self.topleft_x=self.left_bottom_x+self.map_D_resolution/2; #X coordinate of the middle point of top left square
         self.topleft_y=self.left_bottom_y+self.small_map_hight_in_meters-self.map_D_resolution/2;
+        print "small map width is %f and height is %f" % (self.small_map_width_in_meters, self.small_map_hight_in_meters )
         self.map_2D_dimention_width =int(math.floor(self.small_map_width_in_meters/self.map_2D_resolution))
         self.map_2D_dimention_hight =int(math.floor(self.small_map_hight_in_meters/self.map_2D_resolution))
-        
+        print "map_2D width is %d and height is %d" % (self.map_2D_dimention_width, self.map_2D_dimention_hight)
         self.map_2D = [ [ 0 for j in range(self.map_2D_dimention_hight)] for i in range(self.map_2D_dimention_width)]
         self.map_1D_dimention_width=2*self.map_2D_dimention_width;
         self.map_1D_dimention_hight=2*self.map_2D_dimention_hight;
@@ -48,7 +49,6 @@ class mapreader:
     
         self.robots_i_DMap = int(math.floor((self.robot_location_x-self.left_bottom_x) / self.map_D_resolution))
         print "Map D resolution: ",self.map_D_resolution
-        print "robots_i_DMap: ",self.robots_i_DMap
         self.robots_j_DMap = int(math.floor((self.small_map_hight_in_meters-self.robot_location_y) / self.map_D_resolution))
     
         #Run
@@ -64,8 +64,9 @@ class mapreader:
     def map_twoD_creator(self):
         #notice that number of small squares not must divide to D.
         #ignore the left overs!!!!****        
-        num_of_small_squares_in_a_d_square_width=int(self.map_2D_resolution/self.small_map_square_resolution);
-        num_of_small_squares_in_a_d_square_hight=int(self.map_2D_resolution/self.small_map_square_resolution);
+        num_of_small_squares_in_a_d_square_width=int(self.map_2D_resolution/self.small_map_square_resolution)
+        num_of_small_squares_in_a_d_square_hight=int(self.map_2D_resolution/self.small_map_square_resolution)
+        print "num of squares in a 2d squre width is %f and height is %d" % (num_of_small_squares_in_a_d_square_width, num_of_small_squares_in_a_d_square_hight)
         
         # create occupation map where each square is in the size of 2DX2D
         for i in range(self.map_2D_dimention_width):
@@ -86,9 +87,9 @@ class mapreader:
             
     def printMatrix(self, matrix, width, height):
         output = ""
-        for j in range(height):
-            for i in range(width):
-                output+=str(matrix[i][j])
+        for i in range(height):
+            for j in range(width):
+                output+=str(matrix[j][i])
             output+="\n"
         print output
             

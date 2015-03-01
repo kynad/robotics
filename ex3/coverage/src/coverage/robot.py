@@ -13,7 +13,7 @@ class TraverseBot:
     
     def __init__(self, girth):
         self.girth = girth
-        rospy.init_node("traverse_bot")
+        rospy.init_node("coverage_node")
         self.publisher = rospy.Publisher('cmd_vel', Twist, queue_size=int(self.RATE))
         rospy.sleep(1)
         self.rate = rospy.Rate(self.RATE)
@@ -67,5 +67,6 @@ class DirectionalBot(TraverseBot):
         self.go_forward()
         self.turn_right()
     def go(self, direction):
+        print "going "+direction
         eval("self.go_"+direction)()
     
