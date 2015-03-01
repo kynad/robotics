@@ -6,7 +6,7 @@ from nav_msgs.srv import GetMap
 import numpy, rospy
 
 
-ROBOT_GIRTH = 0.5
+ROBOT_GIRTH = 0.333
 
 def convert_occupance_values(values):
     # for now, just convert all numbers to positive.
@@ -41,6 +41,10 @@ def dense_line(line):
 def transpose(matrix):
     return zip(*matrix)
 
+def diam():
+    # This is to acount for the robot turns
+    return 1.45*ROBOT_GIRTH
+
 if __name__ == "__main__":
     map_client = rospy.ServiceProxy("static_map", GetMap)
     rospy.wait_for_service("static_map")
@@ -53,11 +57,11 @@ if __name__ == "__main__":
     pgm_map = [convert_occupance_values(responce.map.data[i:i+width]) for i in xrange(0, width*height, width)]
     print "again, width is %d and height is %d" % (len(pgm_map), len(pgm_map[0]))
 
-    small_map = map(dense_line, pgm_map)
+    #small_map = map(dense_line, pgm_map)
     #print small_map
-    small_map = transpose(map(dense_line, transpose(small_map)))
+    #small_map = transpose(map(dense_line, transpose(small_map)))
 
-    print "width of 2d is %d and height is %d" % (len(small_map), len(small_map[0]))
+    #print "width of 2d is %d and height is %d" % (len(small_map), len(small_map[0]))
     #print small_map
     #for line in small_map:
     #    print "".join(map(lambda x: str(min(1,x)), line))
@@ -66,16 +70,24 @@ if __name__ == "__main__":
     robot_x = rospy.get_param('/amcl/initial_pose_x')
     robot_y = rospy.get_param('/amcl/initial_pose_y')
 
+    print "initial pose is (%f,%f)" % (robot_x, robot_y)
+
     final_map = pgm_map
     final_map.reverse()
     #final_map= transpose(final_map)
-    reader = mapreader(final_map, resolution, ROBOT_GIRTH, ROBOT_GIRTH, robot_x, robot_y)
+    reader = mapreader(final_map, resolution, diam(), diam(), robot_x, robot_y)
 
     directions = convert_path_to_directions(reader.path)
 
     bot = DirectionalBot(ROBOT_GIRTH)
     index = 0
-    while not rospy.is_shutdown():
-         bot.go(directions[index])
-         index = (index + 1) % len(directions)
-         rospy.sleep(1)
+    bot.turn_left()
+    bot.turn_left()
+    bot.turn_left()
+    bot.turn_left()
+
+    
+#    while not rospy.is_shutdown():
+#         bot.go(directions[index])
+#         index = (index + 1) % len(directions)
+#         rospy.sleep(1)

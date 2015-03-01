@@ -16,13 +16,37 @@ define topurg ranger
   size [ 0.050 0.050 0.100 ]
 )
 
-define pr2 position
+define blah position
 (
-  size [0.650 0.650 0.250]
-  origin [-0.050 0 0 0]
-  gui_nose 1
+    size [0.33 0.33 0.1]
+
+    # This block approximates the circular shape of the robot
+    block
+    ( 
+       points 16
+       point[0]  [ 0.225 0.000 ]
+       point[1]  [ 0.208 0.086 ]
+       point[2]  [ 0.159 0.159 ]
+       point[3]  [ 0.086 0.208 ]
+       point[4]  [ 0.000 0.225 ]
+       point[5]  [ -0.086 0.208 ]
+       point[6]  [ -0.159 0.159 ]
+       point[7]  [ -0.208 0.086 ]
+       point[8]  [ -0.225 0.000 ]
+       point[9]  [ -0.208 -0.086 ]
+       point[10] [ -0.159 -0.159 ]
+       point[11] [ -0.086 -0.208 ]
+       point[12] [ -0.000 -0.225 ]
+       point[13] [ 0.086 -0.208 ]
+       point[14] [ 0.159 -0.159 ]
+       point[15] [ 0.208 -0.086 ]
+
+       color "gray50"
+    )
+  #origin [-0.050 0 0 0]
   drive "omni"
-  topurg(pose [ 0.275 0 0 0 ])
+  #topurg(pose [ 0.275 0 0 0 ])
+  color "gray50"
 )
 
 define floorplan model
@@ -52,7 +76,7 @@ window
 ( 
   size [ 745.000 448.000 ] 
 
-  rotate [ 0 -1.560 ]
+  rotate [ 0 0 ] #-1.560 ]
   scale 30.287 
 )
 
@@ -62,9 +86,9 @@ floorplan
   name "willow"
   bitmap "../maps/willow-full-0.025.pgm"
   size [58.300 45.625 1.000]
-  pose [ -22.812 29.150 0 90.000 ] 
+  pose [ 29.15 22.8125 0 0.000 ] 
 )
 
 # throw in a robot
-pr2( pose [ 13.271 28.40 0 0.175 ] name "pr2" color "blue")
-block( pose [ -25.251 10.586 0 180.000 ] color "red")
+blah( pose [ 10.0 12.0 0 90.0 ] name "pr2" color "blue")
+#block( pose [ -25.251 10.586 0 180.000 ] color "red")

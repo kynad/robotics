@@ -1,13 +1,13 @@
 #!/usr/bin/python
 
 
-import rospy
+import rospy, math
 from geometry_msgs.msg import Twist
 
 class TraverseBot:
 
-    ANGLE = 1.57
-    RATE = 5.0
+    ANGLE = math.radians(90)
+    RATE = 10.0
     LEFT=1
     RIGHT=-1
     
