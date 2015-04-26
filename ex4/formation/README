@@ -1,0 +1,64 @@
+oooooooo.   oooooooooo       .o.       ooooooooo.   ooo        oooo oooooooooo
+`88   `Y88. `88'    `8      .888.      `88'   `Y8b  `88.       .88' `88'    `8
+ 88   .d88'  88            .8"888.      88      888  888b     d'88   88     
+ 88ooo88P'   88oooo8      .8' `888.     88      888  8 Y88. .P  88   88oooo8
+ 88`88b.     88    "     .88ooo8888.    88      888  8  `888'   88   88    "
+ 88  `88b.   88      o  .8'     `888.   88     d88'  8    Y     88   88      o
+o88o  o888o o88oooood8 o88o     o8888o o88bood8P'   o8o        o88o o88oooood8
+
+
+                        For Ex1 in Multi-Robot Systems
+
+
+                         By Dany Rovinsky (304359276)
+
+
+
+
+                                --------------
+                                Adding a robot
+                                --------------
+
+1. Add the following node to formation.launch file:
+
+  <include file="$(find formation)/launch/robot.launch">
+    <arg name="name" value=""/>
+    <arg name="position" value=""/>
+  </include>
+  
+2. Fill both arguments (see examples in the existing robot nodes)
+
+3. Increase the value of the param "number_of_robots".
+
+4. Open ./world/willow-multi-erratic.world file and add the new robot to the 
+   bottom. Note that names don't have to match, but positions should.
+   
+5. Save both files and execute 'roslaunch formation formation.launch' as usual.
+
+
+
+                               ----------------
+                               Removing a robot
+                               ----------------
+
+* Note: Although it's pretty clear how to remove the robot, it's very important
+        to remember to match the param "number_of_robots" to be exactly
+        the same as the actual number of robot nodes.
+        If that param is smaller, some robots won't participate in the task,
+        while if the number is larger - the monitor node will stuck forever,
+        waiting for too many robots to report.
+        
+        
+        
+                              -----------------
+                              Additional notes:
+                              -----------------
+
+* I imlemented the Leader to turn to a random direction, each time it 
+  approaches an obsticle, rather than turning to the same direction every time.
+  This can be altered by commenting out lines 54-55 in formation_robot.py:
+                  random_direction = 2 * randint(0,1) - 1
+                  angular_twist.angular.z *= random_direction
+
+
+

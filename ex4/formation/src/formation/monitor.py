@@ -1,71 +1,57 @@
 #!/usr/bin/python
 
-import rospy, actionlib, my_utils, sys
-from formation.msg import RobotLocation, start_followAction, start_followGoal
-
-GROUP_STATUS = {}
-
-def find_nearest_robot(robot1, exclude=[]):
-    robot1_location = GROUP_STATUS[robot1]
-    return sorted(set(GROUP_STATUS)-set(exclude), key=lambda key: my_utils.distance(GROUP_STATUS[key], robot1_location))[0]
+from monitor_helper import *
+import rospy, actionlib, my_utils
+from formation.msg import RobotLocation
 
 
+## @class Monitor
+#  Implements the monitor node.
 class Monitor:
-
-    def __init__(self, number_of_robots, leader_id):
+    ##
+    # @param number_of_robots - the size of the group to monitor (will be used to know for how many robots should this node wait, before start)
+    # @param leader_name      - the string identifier of the robot that will get the leader role (e.g. "robot_2")
+    def __init__(self, number_of_robots, leader_name):
         self.number_of_robots = number_of_robots
-        self.leader_id = leader_id
-        self.group_order = [self.leader_id]
-        rospy.Subscriber("/monitor_topic", RobotLocation, self.monitor_callback)
-        print "Working with %d robots. robot_%d is the group's leader." % (self.number_of_robots, self.leader_id)
-        self.rate = rospy.Rate(10)
-        self.wait_for_the_robots_to_update_location()
-        print self.group_order
-        self.clients = self.init_clients()
-        print "servers online"
+        self.leader_name = leader_name
+        self.robots_group = GroupManager()        
+        rospy.Subscriber(my_utils.C_MONITOR_TOPIC_NAME, RobotLocation, self.monitor_callback)
+        rospy.loginfo("Working with %d robots, %s is the group leader." % (number_of_robots, self.leader_name))
+        self.wait_for_robots()
         
+    ## The callback function for incoming messages on the monitor topic.
+    #  Upon recieving a robot's location, adds that robot to the group.
+    #
+    # @param data - the RobotLocation msg type.
     def monitor_callback(self, data):
-       GROUP_STATUS[data.robot_id] = (data.x_coord, data.y_coord)
-       rospy.loginfo("Found robot %d, at (%f,%f)" % (data.robot_id, data.x_coord, data.y_coord))
+       self.robots_group.add_robot(data.robot_name, (data.x_coord, data.y_coord))
+       rospy.loginfo("Found robot %s, at (%f,%f)" % (data.robot_name, data.x_coord, data.y_coord))
+          
+    ## Waits for robots to send their locations.
+    #  Ends waiting when the group is of the same size as the variable number_of_robots.
+    def wait_for_robots(self):
+        rate = rospy.Rate(my_utils.C_DEFAULT_RATE)
+        while len(self.robots_group) < self.number_of_robots:
+            rospy.logwarn("Still waiting for robots, only the following checked so far: %s " % str(self.robots_group))
+            rate.sleep()
+        rospy.loginfo("Robots are ready!")
         
-    def init_clients(self):
-        clients = {}
-        for _id in self.group_order:
-            clients[_id] = actionlib.SimpleActionClient('start_following_%d' % _id, start_followAction)
-            clients[_id].wait_for_server()
-        return clients
+    ## Tells the GroupManager object to calculate the actions and send them to the robots.
+    def send_actions(self):
+        self.robots_group.send_actions(self.leader_name)
         
-    def wait_for_the_robots_to_update_location(self):
-        num_ready = len(GROUP_STATUS)
-        while num_ready < self.number_of_robots:
-            print "still waiting for all robots in the group to be ready, currently only %d are" % num_ready
-            self.rate.sleep()
-            num_ready = len(GROUP_STATUS)
-        print "Ready!"
-        self.build_list_based_on_distances()       
-        
-    def send_goals_to_group(self):
-        goal = start_followGoal
-        temp_list = [self.leader_id] + self.group_order
-        for client_id,local_leader in zip(temp_list[1:], temp_list[:-1]):
-            goal.local_leader = local_leader
-            self.clients[client_id].send_goal(goal)
-            
+    ## Tells the GroupManager to begin waiting for robots to finish the actions.
     def wait_for_results(self):
-        map(lambda client: client.wait_for_result(), self.clients.values())
-        
-    def build_list_based_on_distances(self):
-        for i in range(self.number_of_robots - 1):
-            self.group_order.append(find_nearest_robot(self.group_order[-1], self.group_order))
-        
-
+        self.robots_group.wait_for_results()
 
 
 if __name__ == "__main__":
     rospy.init_node("monitor")
+    rospy.sleep(1)
     group_size = rospy.get_param("number_of_robots")
-    leader_id = rospy.get_param("leader_num")
-    monitor = Monitor(group_size, leader_id)
-    monitor.send_goals_to_group()
+    leader_name = rospy.get_param("leader_name")
+    monitor = Monitor(group_size, leader_name)
+    monitor.send_actions()
     monitor.wait_for_results()
+    rospy.spin()
     

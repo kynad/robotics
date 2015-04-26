@@ -1,0 +1,11 @@
+<launch>
+    <arg name="name"/>
+    <arg name="position"/>
+    
+    <group ns="$(arg name)">
+    	<param name="tf_prefix" value="$(arg name)" />
+	    <node pkg="tf" type="static_transform_publisher" name="link_broadcaster" args="$(arg position) /map /$(arg name)/odom 100" />
+        <node pkg="formation" type="robot.py" name="robot" output="screen" />
+    </group>
+</launch>
+

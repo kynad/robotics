@@ -1,0 +1,6 @@
+string local_leader
+---
+bool result
+---
+bool status
+

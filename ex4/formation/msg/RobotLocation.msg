@@ -1,5 +1,4 @@
 Header header
-int32 robot_id
-bool is_ready
+string robot_name
 float32 x_coord
 float32 y_coord

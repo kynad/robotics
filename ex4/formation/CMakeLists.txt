@@ -42,7 +42,6 @@ catkin_python_setup()
 ## Generate messages in the 'msg' folder
 add_message_files(
   FILES
-  RobotStatus.msg
   RobotLocation.msg
 )
 
@@ -56,8 +55,7 @@ add_message_files(
 ## Generate actions in the 'action' folder
 add_action_files(
   FILES
-  start_follow.action
-#   Action2.action
+  StartFollow.action
 )
 
 ## Generate added messages and services with any dependencies listed here
