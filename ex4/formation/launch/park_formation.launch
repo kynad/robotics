@@ -1,0 +1,31 @@
+<launch>  
+  <param name="/use_sim_time" value="true"/>
+  
+  <param name="leader_name" value="robot_3"/>
+  <param name="number_of_robots" value="4"/>
+  
+  <node name="stage" pkg="stage_ros" type="stageros" args="$(find formation)/world/maze.world"/>  
+  
+  <node name="monitor" pkg="formation" type="monitor.py" output="screen"/>
+  
+  <include file="$(find formation)/launch/robot.launch">
+    <arg name="name" value="robot_0"/>
+    <arg name="position" value="6.5 18.5 0 0 0 0"/>
+  </include>
+  
+  <include file="$(find formation)/launch/robot.launch">
+    <arg name="name" value="robot_1"/>
+    <arg name="position" value="4.25 18.5 0 0 0 0"/>
+  </include>
+  
+  <include file="$(find formation)/launch/robot.launch">
+    <arg name="name" value="robot_2"/>
+    <arg name="position" value="6.5 16.5 0 0 0 0"/>
+  </include>
+  
+  <include file="$(find formation)/launch/robot.launch">
+    <arg name="name" value="robot_3"/>
+    <arg name="position" value="4.25 16.5 0 0 0 0"/>
+  </include>
+</launch>
+
